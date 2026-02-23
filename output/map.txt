@@ -1,0 +1,50 @@
+Modules list:
+-------------
+init.o:
+    HEADER            Offs=000000  Size=000015  Align=00001  Fill=0000
+    ROMINFO           Offs=000000  Size=00000B  Align=00001  Fill=0000
+    VECTORS           Offs=000000  Size=00001C  Align=00001  Fill=0000
+    BANK0             Offs=000000  Size=0000A5  Align=00001  Fill=0000
+main.o:
+    ZEROPAGE          Offs=000000  Size=000008  Align=00001  Fill=0000
+    BANK0             Offs=0000A5  Size=000039  Align=00001  Fill=0000
+
+
+Segment list:
+-------------
+Name                   Start     End    Size  Align
+----------------------------------------------------
+ZEROPAGE              000000  000007  000008  00001
+BANK0                 808000  8080DD  0000DE  00001
+HEADER                80FFC0  80FFD4  000015  00001
+ROMINFO               80FFD5  80FFDF  00000B  00001
+VECTORS               80FFE4  80FFFF  00001C  00001
+
+
+Exports list by name:
+---------------------
+BRK_                      8080DD RLA    COP_                      8080DC RLA    
+IRQ                       8080DB RLA    NMI                       8080B5 RLA    
+main                      8080A5 RLA    
+
+
+Exports list by value:
+----------------------
+main                      8080A5 RLA    NMI                       8080B5 RLA    
+IRQ                       8080DB RLA    COP_                      8080DC RLA    
+BRK_                      8080DD RLA    
+
+
+Imports list:
+-------------
+BRK_ (main.o):
+    init.o                    src/main.inc:3
+COP_ (main.o):
+    init.o                    src/main.inc:3
+IRQ (main.o):
+    init.o                    src/main.inc:3
+NMI (main.o):
+    init.o                    src/main.inc:3
+main (main.o):
+    init.o                    src/main.inc:1
+
