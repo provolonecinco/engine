@@ -1,5 +1,6 @@
 ; Handy defines
 .include "snes.inc"
+.include "general.inc"
 .include "main.inc"
 ;--------------------------------------
 .segment "HEADER"
@@ -108,6 +109,20 @@ map_mode:
     REP #$20
     LDA #0
     TAD               ; return direct page to real zero page
+
+clear_memory:
+    ; clear RAM
+    setaxy16
+    SETDMA 0, $08, null, 512, CGDATA         ; clear CGRAM on channel 0
+    SETDMA 1, $09, null, 0, PPUDATA          ; clear VRAM on channel 1
+    SETDMA 2, $08, null, 0, WMDATA           ; clear WRAM on channel 2
+    LDA #%00000111                          ; fire away
+    STA COPYSTART
+    LDA #%00000100                          ; run channel 2 again to clear upper 64K of WRAM
+    STA COPYSTART
+    
     JMP main
 .endproc 
+null:
+    .byte $00
 ;--------------------------------------

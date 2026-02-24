@@ -1,21 +1,26 @@
 Modules list:
 -------------
+gfx.o:
+    LORAM             Offs=000000  Size=000420  Align=00001  Fill=0000
+    BANK0             Offs=000000  Size=000088  Align=00001  Fill=0000
 init.o:
     HEADER            Offs=000000  Size=000015  Align=00001  Fill=0000
     ROMINFO           Offs=000000  Size=00000B  Align=00001  Fill=0000
     VECTORS           Offs=000000  Size=00001C  Align=00001  Fill=0000
-    BANK0             Offs=000000  Size=0000A5  Align=00001  Fill=0000
+    BANK0             Offs=000088  Size=000120  Align=00001  Fill=0000
 main.o:
-    ZEROPAGE          Offs=000000  Size=000008  Align=00001  Fill=0000
-    BANK0             Offs=0000A5  Size=000039  Align=00001  Fill=0000
+    BANK0             Offs=0001A8  Size=00006C  Align=00001  Fill=0000
+zp.o:
+    ZEROPAGE          Offs=000000  Size=00001C  Align=00001  Fill=0000
 
 
 Segment list:
 -------------
 Name                   Start     End    Size  Align
 ----------------------------------------------------
-ZEROPAGE              000000  000007  000008  00001
-BANK0                 808000  8080DD  0000DE  00001
+ZEROPAGE              000000  00001B  00001C  00001
+LORAM                 000200  00061F  000420  00001
+BANK0                 808000  808213  000214  00001
 HEADER                80FFC0  80FFD4  000015  00001
 ROMINFO               80FFD5  80FFDF  00000B  00001
 VECTORS               80FFE4  80FFFF  00001C  00001
@@ -23,28 +28,50 @@ VECTORS               80FFE4  80FFFF  00001C  00001
 
 Exports list by name:
 ---------------------
-BRK_                      8080DD RLA    COP_                      8080DC RLA    
-IRQ                       8080DB RLA    NMI                       8080B5 RLA    
-main                      8080A5 RLA    
+BRK_                      808213 RLA    COP_                      808212 RLA    
+IRQ                       808211 RLA    NMI                       8081E5 RLA    
+cgram_dma                 808000 RLA    framecounter              000014 RLZ    
+joyHeld                   00001A RLZ    joyPressed                000018 RLZ    
+joyState                  000016 RLZ    main                      8081A8 RLA    
+oam_dma                   80802D RLA    pointer                   000010 RLZ    
+
 
 
 Exports list by value:
 ----------------------
-main                      8080A5 RLA    NMI                       8080B5 RLA    
-IRQ                       8080DB RLA    COP_                      8080DC RLA    
-BRK_                      8080DD RLA    
+pointer                   000010 RLZ    framecounter              000014 RLZ    
+joyState                  000016 RLZ    joyPressed                000018 RLZ    
+joyHeld                   00001A RLZ    cgram_dma                 808000 RLA    
+oam_dma                   80802D RLA    main                      8081A8 RLA    
+NMI                       8081E5 RLA    IRQ                       808211 RLA    
+COP_                      808212 RLA    BRK_                      808213 RLA    
+
 
 
 Imports list:
 -------------
 BRK_ (main.o):
-    init.o                    src/main.inc:3
+    init.o                    src/main.inc:2
 COP_ (main.o):
-    init.o                    src/main.inc:3
+    init.o                    src/main.inc:2
 IRQ (main.o):
-    init.o                    src/main.inc:3
+    init.o                    src/main.inc:2
 NMI (main.o):
-    init.o                    src/main.inc:3
+    init.o                    src/main.inc:2
+cgram_dma (gfx.o):
+    main.o                    src/gfx.inc:2
+framecounter (zp.o):
+    main.o                    src/zp.inc:3
+joyHeld (zp.o):
+    main.o                    src/zp.inc:4
+joyPressed (zp.o):
+    main.o                    src/zp.inc:4
+joyState (zp.o):
+    main.o                    src/zp.inc:4
 main (main.o):
     init.o                    src/main.inc:1
+oam_dma (gfx.o):
+    main.o                    src/gfx.inc:1
+pointer (zp.o):
+    gfx.o                     src/zp.inc:2
 
