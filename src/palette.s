@@ -1,15 +1,14 @@
-.include "snes.inc"
-.include "general.inc"
-.include "zp.inc"
-.include "gfx.inc"
+.include "include/snes.inc"
+.include "include/general.inc"
+.include "include/zp.inc"
+.include "include/gfx.inc"
 ;--------------------------------------
 .segment "LORAM"
-; palette buffer
 CGRAMbuf:       .res 512
 ;--------------------------------------
 .segment "BANK0"
 ;--------------------------------------
-.proc cgram_dma ; 16bit AXY
+.proc cgram_dma
     setaxy16
     ; Setup DMA for 512 bytes to CGRAM
     SETDMA 0, $00, CGRAMbuf, 512, CGDATA
@@ -18,8 +17,7 @@ CGRAMbuf:       .res 512
     RTS
 .endproc
 ;--------------------------------------
-.proc buffer_palette ; 16-bit AXY (X: CGRAM Index, pointer: source)
-; buffers a 32-byte (16 color) palette from a pointer
+.proc buffer_palette
     setaxy16
     LDY #0 
 load:  
@@ -34,19 +32,17 @@ load:
     RTS 
 .endproc 
 ;--------------------------------------
-.proc buffer_palette_indirect ; 16-bit AXY
-; buffers a palette from the palette table 
+.proc buffer_palette_indirect 
     setaxy16
     ; TO-DO: write the dam function yo
     RTS 
 .endproc 
 ;--------------------------------------
-.proc cgrambuf_clear ;16-bit AXY
-; Clears the entire CGRAM buffer
+.proc cgrambuf_clear
     setaxy16
     LDX #0 
 clear: 
-    STZ CGRAMbuf, X
+    STA CGRAMbuf, X
     INX 
     INX 
     CPX #512

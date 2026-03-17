@@ -1,6 +1,12 @@
+; main function 
+.global main
+
+; Interrupt/Exception handlers
+.global IRQ, NMI, BRK_, COP_
+
 ; ----------
 ; Controller Defines
-; AND with polled buttons
+; bitwise AND with controller state
 JOY_SIGNATURE   = 4 << 0
 KEY_R           = 1 << 4
 KEY_L           = 1 << 5
@@ -14,18 +20,21 @@ KEY_START       = 1 << 12
 KEY_SELECT      = 1 << 13
 KEY_Y           = 1 << 14
 KEY_B           = 1 << 15
+
 ; CHR positions in VRAM
 SPRITECHR_BASE  = $0000
 BG1CHR_BASE     = $2000 ; both 4bpp layers share chr data
 BG2CHR_BASE     = $2000
 BG3CHR_BASE     = $4000
+
 ; Tilemap positions in VRAM
-; all are one screen for now
 BG1MAP_BASE     = $5000
 BG2MAP_BASE     = $6000
 BG3MAP_BASE     = $7000
+
 ; Handy macros ----------
 .macro LDPT pointer, addr
+; Direct pointer load from address    
     LDA #<addr
     STA pointer
     LDA #>addr
@@ -35,6 +44,7 @@ BG3MAP_BASE     = $7000
 .endmacro
 
 .macro LDPTI pointer, addr
+; Indirect pointer load from pointer
     LDA addr
     STA pointer
     LDA addr + 1

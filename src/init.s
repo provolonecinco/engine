@@ -1,7 +1,6 @@
 ; Handy defines
-.include "snes.inc"
-.include "general.inc"
-.include "main.inc"
+.include "include/snes.inc"
+.include "include/general.inc"
 ;--------------------------------------
 .segment "HEADER"
 ;--------------------------------------

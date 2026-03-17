@@ -1,9 +1,7 @@
-.include "snes.inc"
-.include "general.inc"
-.include "zp.inc"
-.include "gfx.inc"
-
-.include "main.inc"
+.include "include/snes.inc"
+.include "include/general.inc"
+.include "include/zp.inc"
+.include "include/gfx.inc"
 ;--------------------------------------
 .segment "BANK0"
 ;--------------------------------------

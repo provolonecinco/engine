@@ -1,20 +1,18 @@
-.include "snes.inc"
-.include "general.inc"
-.include "zp.inc"
-.include "gfx.inc"
+.include "include/snes.inc"
+.include "include/general.inc"
+.include "include/zp.inc"
+.include "include/gfx.inc"
 ;--------------------------------------
 .segment "ZEROPAGE"
-; oam position resets to 0 every frame
 oampos:         .res 2
 ;--------------------------------------
 .segment "LORAM"
-; OAM buffer, DMA into VRAM every VBlank
 OAMbuf:         .res 512
 OAMbuf_hi:      .res 3
 ;--------------------------------------
 .segment "BANK0"
 ;--------------------------------------
-.proc oam_dma ; 16bit AXY
+.proc oam_dma
     setaxy16    
     LDA #0 
     STA OAMADDL
@@ -25,9 +23,7 @@ OAMbuf_hi:      .res 3
     RTS
 .endproc
 ;--------------------------------------
-.proc clear_oam ; 16-bit AXY
-; hides all sprites to prepare for frame
-; we're handcrafting OAM the old fashioned way
+.proc clear_oam
     setaxy16 
     LDY #0
     TYX
@@ -47,12 +43,10 @@ clear:
     RTS 
 .endproc 
 ;--------------------------------------
-.proc buffer_sprite ; 8-bit A, 16-bit XY
-; pointer: source
-; r0: x position 
-; r1: y position
-; buffers a sprite directly into OAMbuf
-; terminated with a $80 byte
+.proc buffer_sprite
+xpos = r0
+ypos = r1
+
     seta8 
     setxy16 
     LDY #0
@@ -61,14 +55,14 @@ load:
     LDA [pointer], Y ; X Position
     BMI done
     CLC 
-    ADC r0
+    ADC xpos
     STA OAMbuf, X
     INY 
     INX 
     
     LDA [pointer], Y ; Y Position
     CLC 
-    ADC r1
+    ADC ypos
     STA OAMbuf, X
     INY 
     INX 
