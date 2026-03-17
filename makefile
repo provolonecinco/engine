@@ -1,9 +1,8 @@
-.PHONY: all clean dir run gfx
+.PHONY: all clean dir run
 
 OUTPUT := output
 
-MESEN := "C:\Programs\Mesen\Mesen.exe"
-SUPERFAMICONV := C:\Programs\superfamiconv_win64_v0.10.0\superfamiconv.exe
+MESEN := "Mesen.exe"
 
 SRCDIR	:= src
 ROM_NAME := $(OUTPUT)/engine.sfc
@@ -14,16 +13,16 @@ OBJ_DIR := $(OUTPUT)/obj
 SRC_FILES := $(wildcard $(SRCDIR)/*.s)
 OBJ_FILES := $(patsubst $(SRCDIR)/%.s, $(OBJ_DIR)/%.o, $(SRC_FILES))
 
-all: $(ROM_NAME)
+all: dir $(ROM_NAME)
 
 clean:
 	@rmdir /s /q output
 
 dir:
-	@mkdir output
-	@mkdir output\obj
+	@if not exist "$(OUTPUT)" mkdir $(OUTPUT)
+	@if not exist "$(OBJ_DIR)" mkdir "$(OBJ_DIR)"
 
-run: $(ROM_NAME)
+run: dir $(ROM_NAME)
 	 @start $(MESEN) $(ROM_NAME)
 
 # Link output files into ROM
