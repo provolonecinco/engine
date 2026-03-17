@@ -7,6 +7,10 @@
 .global load_raw_tilemap
 .global buffer_palette
 .global cgrambuf_clear
+.global load_2bpp_tiles
+.global load_4bpp_tiles
+.global buffer_sprite
+.global clear_oam
 
 ; palette slot references
 PAL_0   = $00
