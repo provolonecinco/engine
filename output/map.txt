@@ -2,14 +2,14 @@ Modules list:
 -------------
 gfx.o:
     LORAM             Offs=000000  Size=000420  Align=00001  Fill=0000
-    BANK0             Offs=000000  Size=000088  Align=00001  Fill=0000
+    BANK0             Offs=000000  Size=0000AF  Align=00001  Fill=0000
 init.o:
     HEADER            Offs=000000  Size=000015  Align=00001  Fill=0000
     ROMINFO           Offs=000000  Size=00000B  Align=00001  Fill=0000
     VECTORS           Offs=000000  Size=00001C  Align=00001  Fill=0000
-    BANK0             Offs=000088  Size=000120  Align=00001  Fill=0000
+    BANK0             Offs=0000AF  Size=000120  Align=00001  Fill=0000
 main.o:
-    BANK0             Offs=0001A8  Size=00006C  Align=00001  Fill=0000
+    BANK0             Offs=0001CF  Size=0000B6  Align=00001  Fill=0000
 zp.o:
     ZEROPAGE          Offs=000000  Size=00001C  Align=00001  Fill=0000
 
@@ -20,7 +20,7 @@ Name                   Start     End    Size  Align
 ----------------------------------------------------
 ZEROPAGE              000000  00001B  00001C  00001
 LORAM                 000200  00061F  000420  00001
-BANK0                 808000  808213  000214  00001
+BANK0                 808000  808284  000285  00001
 HEADER                80FFC0  80FFD4  000015  00001
 ROMINFO               80FFD5  80FFDF  00000B  00001
 VECTORS               80FFE4  80FFFF  00001C  00001
@@ -28,11 +28,12 @@ VECTORS               80FFE4  80FFFF  00001C  00001
 
 Exports list by name:
 ---------------------
-BRK_                      808213 RLA    COP_                      808212 RLA    
-IRQ                       808211 RLA    NMI                       8081E5 RLA    
-cgram_dma                 808000 RLA    framecounter              000014 RLZ    
+BRK_                      808284 RLA    COP_                      808283 RLA    
+IRQ                       808282 RLA    NMI                       808256 RLA    
+buffer_palette            808088 RLA    cgram_dma                 808000 RLA    
+cgrambuf_clear            80809F RLA    framecounter              000014 RLZ    
 joyHeld                   00001A RLZ    joyPressed                000018 RLZ    
-joyState                  000016 RLZ    main                      8081A8 RLA    
+joyState                  000016 RLZ    main                      8081EF RLA    
 oam_dma                   80802D RLA    pointer                   000010 RLZ    
 
 
@@ -42,9 +43,10 @@ Exports list by value:
 pointer                   000010 RLZ    framecounter              000014 RLZ    
 joyState                  000016 RLZ    joyPressed                000018 RLZ    
 joyHeld                   00001A RLZ    cgram_dma                 808000 RLA    
-oam_dma                   80802D RLA    main                      8081A8 RLA    
-NMI                       8081E5 RLA    IRQ                       808211 RLA    
-COP_                      808212 RLA    BRK_                      808213 RLA    
+oam_dma                   80802D RLA    buffer_palette            808088 RLA    
+cgrambuf_clear            80809F RLA    main                      8081EF RLA    
+NMI                       808256 RLA    IRQ                       808282 RLA    
+COP_                      808283 RLA    BRK_                      808284 RLA    
 
 
 
@@ -58,8 +60,12 @@ IRQ (main.o):
     init.o                    src/main.inc:2
 NMI (main.o):
     init.o                    src/main.inc:2
+buffer_palette (gfx.o):
+    main.o                    src/gfx.inc:8
 cgram_dma (gfx.o):
-    main.o                    src/gfx.inc:2
+    main.o                    src/gfx.inc:6
+cgrambuf_clear (gfx.o):
+    main.o                    src/gfx.inc:9
 framecounter (zp.o):
     main.o                    src/zp.inc:3
 joyHeld (zp.o):
@@ -71,7 +77,8 @@ joyState (zp.o):
 main (main.o):
     init.o                    src/main.inc:1
 oam_dma (gfx.o):
-    main.o                    src/gfx.inc:1
+    main.o                    src/gfx.inc:5
 pointer (zp.o):
+    main.o                    src/zp.inc:2
     gfx.o                     src/zp.inc:2
 

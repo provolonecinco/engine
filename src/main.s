@@ -7,8 +7,11 @@
 ;--------------------------------------
 .segment "BANK0"
 ;--------------------------------------
+sample_palette: 
+    .word $FFFF, $0000, $FFFF, $0000, $FFFF, $0000, $FFFF, $0000, $FFFF, $0000, $FFFF, $0000, $FFFF, $0000, $FFFF, $0000
+
 .proc main     
-    seta16 
+    setaxy16 
     LDA #%00000001          ; background mode 1
     STA BGMODE
 
@@ -29,6 +32,10 @@
     ; Sprite CHR locations 
     LDA #(SPRITECHR_BASE >> 14) | OBSIZE_8_16
     STA OBSEL 
+
+    LDPT pointer, sample_palette
+    LDX #PAL_0
+    JSR buffer_palette
 
     seta8 
     LDA #$80        ; enable NMI at VBlank

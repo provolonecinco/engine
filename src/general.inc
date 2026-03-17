@@ -20,6 +20,7 @@ BG1CHR_BASE     = $2000 ; both 4bpp layers share chr data
 BG2CHR_BASE     = $2000
 BG3CHR_BASE     = $4000
 ; Tilemap positions in VRAM
+; all are one screen for now
 BG1MAP_BASE     = $5000
 BG2MAP_BASE     = $6000
 BG3MAP_BASE     = $7000
