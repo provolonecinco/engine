@@ -82,3 +82,9 @@ BG3MAP_BASE     = $7000
     LDA #size 
     STA DMALEN | channel << 4 
 .endmacro
+
+; make code a little more readable
+.macro SET register, value
+    LDA value 
+    STA register
+.endmacro 

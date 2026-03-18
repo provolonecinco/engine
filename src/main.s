@@ -5,57 +5,24 @@
 ;--------------------------------------
 .segment "BANK0"
 ;--------------------------------------
-sample_palette: 
-    .incbin "pal/basic.pal"
-
-sample_chr: 
-    .incbin "chr/spr.chr"
-
-sample_sprite:
-    .byte $00, $00, $01, $00 
-    .byte $80
-
 .proc main     
     setaxy16 
-    LDA #%00000001          ; background mode 1
-    STA BGMODE
-
+    SET BGMODE, #%00000001          ; background mode 1
     ; BG1 Tilemap Location 
-    LDA #(BG1MAP_BASE >> 10) << 2  
-    STA BG1SC        
+    SET BG1SC, #(BG1MAP_BASE >> 10) << 2  
     ; BG2 Tilemap Location
-    LDA #(BG2MAP_BASE >> 10) << 2  
-    STA BG2SC          
+    SET BG2SC, #(BG2MAP_BASE >> 10) << 2  
     ; BG3 Tilemap Location
-    LDA #(BG3MAP_BASE >> 10) << 2   
-    STA BG3SC    
-
+    SET BG3SC, #(BG3MAP_BASE >> 10) << 2      
     ; BG CHR locations
-    LDA #(BG3CHR_BASE >> 4) | (BG2CHR_BASE >> 8) | (BG1CHR_BASE >> 12)
-    STA BGCHRADDR   
-
+    SET BGCHRADDR, #(BG3CHR_BASE >> 4) | (BG2CHR_BASE >> 8) | (BG1CHR_BASE >> 12)   
     ; Sprite CHR locations 
-    LDA #(SPRITECHR_BASE >> 14) | OBSIZE_8_16
-    STA OBSEL 
+    SET OBSEL, #(SPRITECHR_BASE >> 14) | OBSIZE_8_16 
 
-    LDPT pointer, sample_palette
-    LDX #PAL_8
-    JSR buffer_palette
-
-    LDA #INC_DATAHI ; increment VRAM addrress on high byte
-    STA PPUCTRL
-    LDPT pointer, sample_chr
-    LDA #SPRITECHR_BASE
-    JSR load_4bpp_tiles
-
-    seta8 
-    LDA #$80        ; enable NMI at VBlank
-    STA NMITIMEN
-    
-    LDA #$10 
-    STA TM          ; enable sprites
-    LDA #$0F         
-    STA PPUBRIGHT   ; turn screen ON 
+    seta8     
+    SET NMITIMEN, #$80  ; enable NMI at VBlank
+    SET TM, #$10        ; enable sprites 
+    SET PPUBRIGHT, #$0F ; turn screen ON
 loop:
     setaxy16
     LDA #$00
@@ -63,13 +30,6 @@ loop:
     TAY 
 
     JSR clear_oam
-    
-    LDPT pointer, sample_sprite
-    LDA #$7C 
-    STA r0 
-    LDA #$70
-    STA r1
-    JSR buffer_sprite
 
     LDA framecounter
 WaitVBlank:
