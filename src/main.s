@@ -2,9 +2,14 @@
 .include "include/general.inc"
 .include "include/zp.inc"
 .include "include/gfx.inc"
+.include "include/text.inc"
 ;--------------------------------------
 .segment "BANK0"
 ;--------------------------------------
+
+sample_text:
+    .byte "Hello", TXT::END
+
 .proc main     
     setaxy16 
     SET BGMODE, #%00000001          ; background mode 1
@@ -19,6 +24,13 @@
     ; Sprite CHR locations 
     SET OBSEL, #(SPRITECHR_BASE >> 14) | OBSIZE_8_16 
 
+    LDPT pointer, sample_text
+    JSR queue_text
+
+    LDA textFlags
+    ORA #TEXT_ACTIVE
+    STA textFlags
+
     seta8     
     SET NMITIMEN, #$80  ; enable NMI at VBlank
     SET TM, #$10        ; enable sprites 
@@ -30,6 +42,8 @@ loop:
     TAY 
 
     JSR clear_oam
+
+    JSR update_text
 
     LDA framecounter
 WaitVBlank:
