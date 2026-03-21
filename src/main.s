@@ -11,7 +11,7 @@ sample_palette:
     .incbin "pal/font.pal"
 
 sample_text:
-    .byte "hi", TXT::END
+    .byte "wow", TXT::END
 
 .proc main     
     setaxy16 

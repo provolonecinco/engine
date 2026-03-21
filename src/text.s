@@ -60,10 +60,13 @@ get_byte:
     JMP copy_tile ; copy tile into buffer
 done: 
     ; copy width for the tile we just pasted
-    LDA #5
+    setaxy8
+    LDA [textptr]
+    TAX 
+    LDA sample_widths, X
     STA shift
 
-    seta16 
+    setaxy16 
     INC textptr
     ; all done with this iteration
     JMP update_text::done
@@ -103,6 +106,7 @@ paste:
     ; hard store so we can clear the 
     ; leading edge for the next char #tbh
     LDA r1 + 1
+    ORA buffer + 16, Y
     STA buffer + 16, Y
     
     STZ r1              ; clear our scratchpad
@@ -142,5 +146,15 @@ jump:   ; jump table for opcodes
     JMP update_text::done
 .endproc
 ;--------------------------------------
+
+sample_widths: 
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    .byte 0, 5, 4, 7, 6, 6, 8, 3, 5, 5, 6, 6, 3, 6, 3, 7
+    .byte 6, 4, 6, 6, 6, 6, 6, 6, 6, 6, 4, 4, 6, 6, 6, 6
+    .byte 7, 6, 6, 6, 6, 6, 6, 6, 6, 5, 6, 6, 5, 6, 6, 6
+    .byte 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5, 4, 5, 5, 6
+    .byte 3, 6, 5, 5, 5, 5, 6, 6, 5, 3, 6, 5, 3, 6, 5, 5
+    .byte 5, 5, 5, 6, 5, 6, 5, 6, 5, 5, 5, 6, 3, 6, 8, 0
 sample_font:
     .incbin "chr/font.chr"
