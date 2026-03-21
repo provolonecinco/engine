@@ -11,7 +11,7 @@ sample_palette:
     .incbin "pal/font.pal"
 
 sample_text:
-    .byte "A", TXT::END
+    .byte "hi", TXT::END
 
 .proc main     
     setaxy16 
@@ -32,6 +32,8 @@ sample_text:
     JSR buffer_palette
 
     LDPT textptr, sample_text
+    JSR update_text
+    JSR update_text
     JSR update_text
 
     seta8     

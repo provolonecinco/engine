@@ -39,9 +39,8 @@ done:
 .proc init ; local function
 ; initialize the text engine with whatever I guess
     setaxy16
-     
-    LDA #4
-    STA shift
+
+    STZ shift
 
     ; HERE: idk
 
@@ -58,10 +57,12 @@ get_byte:
     LDA [textptr] 
     BMI opcode  ; handle opcode if neg flag set
 
-    ; HERE: get shift amount from LUT
-
     JMP copy_tile ; copy tile into buffer
 done: 
+    ; copy width for the tile we just pasted
+    LDA #5
+    STA shift
+
     seta16 
     INC textptr
     ; all done with this iteration
@@ -99,12 +100,14 @@ paste:
     ORA buffer, Y
     STA buffer, Y
     ; second bitplane
+    ; hard store so we can clear the 
+    ; leading edge for the next char #tbh
     LDA r1 + 1
-    ORA buffer + 16, Y
     STA buffer + 16, Y
     
     STZ r1              ; clear our scratchpad
     STZ r1 + 1
+
     PLX                 ; restore index
     INX
     INY
