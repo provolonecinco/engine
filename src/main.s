@@ -8,7 +8,7 @@
 ;--------------------------------------
 
 sample_text:
-    .byte "Hello", TXT::END
+    .byte "A", TXT::END
 
 .proc main     
     setaxy16 
@@ -56,6 +56,7 @@ WaitVBlank:
 ;--------------------------------------
 .proc NMI 
     ; preserve registers
+    PHP 
     PHA         
     PHX         
     PHY         
@@ -83,7 +84,8 @@ WaitVBlank:
     INC framecounter
 	PLY       
     PLX
-    PLA         
+    PLA     
+    PLP    
     RTI
 .endproc
 ;--------------------------------------
@@ -96,6 +98,7 @@ WaitVBlank:
 .endproc
 ;--------------------------------------
 .proc BRK_
+    WAI
     RTI
 .endproc
 ;--------------------------------------
