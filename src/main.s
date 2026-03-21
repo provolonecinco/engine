@@ -7,6 +7,9 @@
 .segment "BANK0"
 ;--------------------------------------
 
+sample_palette:
+    .incbin "pal/font.pal"
+
 sample_text:
     .byte "A", TXT::END
 
@@ -24,12 +27,12 @@ sample_text:
     ; Sprite CHR locations 
     SET OBSEL, #(SPRITECHR_BASE >> 14) | OBSIZE_8_16 
 
-    LDPT pointer, sample_text
-    JSR queue_text
+    LDX #PAL_0
+    LDPT pointer, sample_palette
+    JSR buffer_palette
 
-    LDA textFlags
-    ORA #TEXT_ACTIVE
-    STA textFlags
+    LDPT textptr, sample_text
+    JSR update_text
 
     seta8     
     SET NMITIMEN, #$80  ; enable NMI at VBlank
@@ -42,8 +45,6 @@ loop:
     TAY 
 
     JSR clear_oam
-
-    JSR update_text
 
     LDA framecounter
 WaitVBlank:

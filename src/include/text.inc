@@ -1,29 +1,19 @@
 
 ; TEXT ENGINE USAGE ----------
-; Step 1: set pointer to source text
-; Step 2: Call queue_text
-; Step 3: set active flag to signal engine.
-;   update_text has a check for this and
-;   will not run otherwise!!
-;       LDA textFlags
-;       ORA #TEXT_ACTIVE
-;       STA textFlags
+; Step 1:   set textptr to source text
+; Step 2:   Call update_text once per frame
+;           to decode each character until done
 ; ----------------------------
 
 ; Global Variables
 .globalzp textFlags ; engine state
+.globalzp textptr   ; pointer to text
 
 ; Functions ----------
-.global queue_text ; (source: pointer)
-; initializes text engine
-.global update_text 
-; parses next character in source text,
-; writes it to buffer. decodes one
-; character per frame. 
-
-; TODO: add flag to forego delay and 
-; render text all at once, maybe into
-; larger buffers
+.global update_text ; (source: textptr)
+; call this function once every frame outside of VBlank to 
+; decode a single character into the buffer. The engine will 
+; automatically initialize itself the first time it's run
 
 ; OPCODES ----------
 .scope TXT 
