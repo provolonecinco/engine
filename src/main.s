@@ -10,8 +10,9 @@
 sample_palette:
     .incbin "pal/font.pal"
 
+
 sample_text:
-    .byte "wow", TXT::END
+    .byte "A single line of VWF text.", TXT::END
 
 .proc main     
     setaxy16 
@@ -27,24 +28,24 @@ sample_text:
     ; Sprite CHR locations 
     SET OBSEL, #(SPRITECHR_BASE >> 14) | OBSIZE_8_16 
 
+
     LDX #PAL_0
     LDPT pointer, sample_palette
     JSR buffer_palette
 
     LDPT textptr, sample_text
-    JSR update_text
-    JSR update_text
-    JSR update_text
 
     seta8     
-    SET NMITIMEN, #$80  ; enable NMI at VBlank
-    SET TM, #$10        ; enable sprites 
+    SET NMITIMEN, #$81  ; enable NMI at VBlank, automatic joypad reading
+    SET TM, #$14        ; enable sprites, BG3
     SET PPUBRIGHT, #$0F ; turn screen ON
 loop:
     setaxy16
     LDA #$00
     TAX 
     TAY 
+
+    JSR update_text
 
     JSR clear_oam
 
@@ -65,9 +66,11 @@ WaitVBlank:
     PHY         
     BIT a:NMISTATUS
 
+
     JSR cgram_dma
     JSR oam_dma
 
+    JSR upload_text
     ; Read the controller 
     setaxy16
     LDY joyState
