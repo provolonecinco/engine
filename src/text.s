@@ -4,7 +4,7 @@
 
 ; size of text buffer, in 2bpp tiles
 BUFFER_SIZE     = 2
-DELAY           = 2
+DEFAULT_DELAY   = 2
 
 .include "include/text.inc"
 ; See text.inc for usage information 
@@ -13,14 +13,20 @@ DELAY           = 2
 textFlags:  .res 2 ; text engine status
 textptr:    .res 4 ; source text address
 fontptr:    .res 4 ; font to reference
-pixelPos:   .res 2 ; pixel position in two-tile buffer, aka shift amount
-vramBase:   .res 2 ; VRAM pointer for base tile address
-vramPos:    .res 2 ; VRAM pointer for moving tile address
-timer:      .res 2 
 ;--------------------------------------
 .segment "LORAM"
 ; reserve buffer in work ram
-.align 16 ; aligning means I can see it in the tile viewer easier
+delay:      .res 2
+timer:      .res 2 
+pixel:      .res 2 ; pixel position in two-tile buffer, aka shift amount
+vramBase:   .res 2 ; VRAM pointer for base tile address
+vramPos:    .res 2 ; VRAM pointer for moving tile address
+; canvas data 
+width:      .res 2 ; how many tiles wide can we print
+height:     .res 2 ; how many rows can we print
+column:     .res 2 ; current tile 
+row:        .res 2 ; current row
+tilemapBase:.res 2 ; pointer to top right corner of canvas
 buffer:     .res 16 * BUFFER_SIZE
 ;--------------------------------------
 .segment "BANK0"
@@ -34,17 +40,18 @@ buffer:     .res 16 * BUFFER_SIZE
     JSR init
 skip_init:
 
+    ; check if the timer's out
+    ; if so, then yeah
     DEC timer 
     BNE done 
-    LDA #DELAY
+    LDA delay
     STA timer
-
 
     ; before parsing the next character:
     ; Step 1: If pixel position >= 8, copy tile 1 into tile 0
     ; Step 2: Clear tile 1
     ; Step 3: Subtract 8 from pixel position
-    LDA pixelPos
+    LDA pixel
     CMP #8 
     BCC skip_reset
     LDX #16
@@ -56,10 +63,10 @@ skip_init:
         DEX 
         BPL reset
 
-        LDA pixelPos
+        LDA pixel
         SEC 
         SBC #8
-        STA pixelPos    
+        STA pixel    
 skip_reset:
 
     JMP parse
@@ -70,18 +77,44 @@ done:
 .endproc
 ;--------------------------------------
 .proc init ; local function
-; initialize the text engine with whatever I guess
+; X and Y contain the tilemap position to print to (top left corner) 
     setaxy16
 
-    STZ pixelPos
+    ; advance row(s) if Y != 0
+    TYA 
+    BEQ get_xpos
+    LDA #0
+get_ypos:
+    CLC 
+    ADC #32
+    DEY 
+    BNE get_ypos
+get_xpos:
+    ; shift x position by two to get byte position 
+    STX r0 
+    CLC 
+    ADC r0 
+    CLC 
+    ADC #BG3MAP_BASE
+    STA tilemapBase
 
-    LDA #BG3CHR_BASE + 8
+    ; reset pixel position 
+    STZ pixel
+
+    ; zero out these
+    STZ column
+    STZ row 
+
+    ; leave the first tile blank
+    LDA #BG3CHR_BASE
     STA vramBase
-    STZ vramPos
+    LDA #8
+    STA vramPos
 
-    LDA #DELAY
+    ; initial delay 
+    LDA #DEFAULT_DELAY
+    STA delay
     STA timer
-    ; HERE: idk
 
     ; set engine status
     LDA textFlags
@@ -98,14 +131,14 @@ get_byte:
 
     JMP copy_tile ; copy tile into buffer
 done: 
-    ; copy width for the tile we just pasted
+    ; add width to move pixel position
     setaxy8
     LDA [textptr]
     TAX 
     LDA sample_widths, X
     CLC 
-    ADC pixelPos
-    STA pixelPos
+    ADC pixel
+    STA pixel
 
     ; buffer is ready to be uploaded
     LDA textFlags
@@ -139,7 +172,7 @@ copy:
     ; if we're at the beginning of
     ; tile 0
     PHX                 
-    LDX pixelPos        
+    LDX pixel        
     BEQ paste
     ; Rotate bitplane to the pixel
     ; position within the buffer
@@ -176,7 +209,7 @@ paste:
 .endproc 
 ; OPCODES -----------------------------
 jump:   ; jump table for opcodes
-    .addr opcode_eot
+    .addr opcode_eot, opcode_nl
 ;--------------------------------------
 .proc opcode ; local function 
     seta16 
@@ -219,7 +252,7 @@ copy1:
     ; than or equal to 8:
     ; Step 1: Write tile 2
     ; Step 2: increase vramPos by 16
-    LDA pixelPos
+    LDA pixel
     CMP #8 
     BCC skip_copy2
 copy2: 
@@ -234,7 +267,34 @@ copy2:
     CLC 
     ADC #8
     STA vramPos
+
+    ; advance tilemap position
+    INC column
 skip_copy2:
+
+
+
+write_tilemap: 
+    LDA tilemapBase
+
+    LDY row 
+    BEQ skip_row 
+get_row:
+    CLC 
+    ADC #32
+    DEY
+    BNE get_row 
+skip_row: 
+    CLC 
+    ADC column 
+    STA PPUADDR
+
+    ; get current tile ID 
+    LDA vramPos
+    LSR 
+    LSR 
+    LSR 
+    STA PPUDATA 
 
     ; clear upload flag
     LDA textFlags
@@ -251,6 +311,30 @@ done:
     STA textFlags
     JMP update_text::done
 .endproc
+;--------------------------------------
+.proc opcode_nl ; newline
+    setaxy16 
+    STZ column
+    INC row 
+
+    ; reset pixel position and clear buffer 
+    STZ pixel
+    LDX #32 
+clear:
+    STZ buffer, X 
+    DEX 
+    DEX
+    BPL clear 
+
+    ; advance vrampos to the next tile 
+    LDA vramPos
+    CLC 
+    ADC #8
+    STA vramPos
+
+    INC textptr
+    JMP update_text::done
+.endproc 
 ;--------------------------------------
 
 sample_widths: 

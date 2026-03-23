@@ -17,10 +17,20 @@
 .global upload_text ; 
 ; call this every NMI to upload to CHR if needed
 
+.macro PRINT source, xpos, ypos ; params
+    LDA #<source 
+    STA textptr 
+    LDA #>source 
+    STA textptr + 1
+    LDX #xpos 
+    LDY #ypos
+    JSR update_text
+.endmacro 
+
 ; OPCODES ----------
 .scope TXT 
 END		        =	$F0     ; End of text
-; NL          	=	$F1     ; Force newline
+NL          	=	$F1     ; Force newline
 ; PAGE		    =	$F2     ; Force Page
 ; SFX		    =	$F3	    ; Play Sound Effect     (byte 1 = opcode, byte 2 = SFX #)
 ; SPD         	=	$F4     ; Change Speed          (byte 1 = opcode, byte 2 = speed (if zero, use unmodified speed and di))

@@ -12,7 +12,17 @@ sample_palette:
 
 
 sample_text:
-    .byte "A single line of VWF text.", TXT::END
+    .byte "Um, I made a comment earlier tonight that", TXT::NL
+    .byte "I guess went out over the air that I am", TXT::NL
+    .byte "deeply ashamed of. If I have hurt anyone", TXT::NL
+    .byte "out there, I can't tell you how much I say", TXT::NL 
+    .byte "from the bottom of my heart, I'm so very,", TXT::NL
+    .byte "very sorry. I pride myself and think of", TXT::NL 
+    .byte "myself as a man of faith-as there's a drive", TXT::NL 
+    .byte "into deep left field by Castellanos, it will", TXT::NL
+    .byte "be a home run, and so that'll make it a 4-0", TXT::NL 
+    .byte "ballgame. I don't know if I'm gonna be putting", TXT::NL
+    .byte "on this headset again.", TXT::END
 
 .proc main     
     setaxy16 
@@ -33,7 +43,8 @@ sample_text:
     LDPT pointer, sample_palette
     JSR buffer_palette
 
-    LDPT textptr, sample_text
+    PRINT sample_text, 1, 8
+    JSR upload_text
 
     seta8     
     SET NMITIMEN, #$81  ; enable NMI at VBlank, automatic joypad reading
@@ -44,6 +55,7 @@ loop:
     LDA #$00
     TAX 
     TAY 
+
 
     JSR update_text
 
