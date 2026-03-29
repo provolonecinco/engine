@@ -83,8 +83,28 @@ BG3MAP_BASE     = $7000
     STA DMALEN | channel << 4 
 .endmacro
 
-; make code a little more readable
+; modify value of any given address 
 .macro SET register, value
     LDA value 
     STA register
+.endmacro 
+
+; set bitflag
+.macro BITSET address, value  
+    LDA address
+    ORA #value
+    STA address 
+.endmacro 
+
+; clear bitflag with mask
+.macro BITCLR address, value
+    LDA address 
+    AND #($FF ^ value)
+    STA address 
+.endmacro 
+
+; check bitflag status lol 
+.macro BITCH address, value
+    LDA address 
+    AND #value
 .endmacro 
