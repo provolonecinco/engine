@@ -3,6 +3,7 @@
 .include "include/zp.inc"
 .include "include/gfx.inc"
 .include "include/text.inc"
+.include "include/math.inc"
 ;--------------------------------------
 .segment "BANK0"
 ;--------------------------------------
@@ -24,8 +25,13 @@ sample_palette:
     ; Sprite CHR locations 
     SET OBSEL, #(SPRITECHR_BASE >> 14) | OBSIZE_8_16 
 
-
-
+    LDA #12345
+    STA r0 
+    LDA #24
+    STA r1 
+    JSR divu16
+    LDA r0
+    LDX r2
 
 
     LDX #PAL_0
