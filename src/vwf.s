@@ -34,8 +34,7 @@ buffer:     .res 16 * BUFFER_SIZE
 .proc update_text ; entrypoint
     setaxy16
     ; if engine is already active, skip initialization
-    LDA textFlags
-    AND #TEXT_ACTIVE
+    BITCH textFlags, TEXT_ACTIVE
     BNE skip_init
     JSR init
 skip_init:
@@ -117,9 +116,7 @@ get_xpos:
     STA timer
 
     ; set engine status
-    LDA textFlags
-    ORA #TEXT_ACTIVE
-    STA textFlags
+    BITSET textFlags, TEXT_ACTIVE
     RTS
 .endproc 
 ;--------------------------------------
@@ -141,9 +138,7 @@ done:
     STA pixel
 
     ; buffer is ready to be uploaded
-    LDA textFlags
-    ORA #TEXT_UPLOAD
-    STA textFlags
+    BITSET textFlags, TEXT_UPLOAD
 
     setaxy16 
     INC textptr
@@ -228,8 +223,7 @@ jump:   ; jump table for opcodes
 ; uploads one or two tiles to VRAM at vramBase + vramPos
     setaxy16 
 
-    LDA textFlags
-    AND #TEXT_UPLOAD
+    BITCH textFlags, TEXT_UPLOAD
     BEQ done
 
     ; tile 0 will ALWAYS be uploaded, regardless.
@@ -297,18 +291,14 @@ skip_row:
     STA PPUDATA 
 
     ; clear upload flag
-    LDA textFlags
-    EOR #TEXT_UPLOAD
-    STA textFlags
+    BITCLR textFlags, TEXT_UPLOAD
 done:
     RTS  
 .endproc 
 ;--------------------------------------
 .proc opcode_eot ; End of Text
 ; Clear active status and exit
-    LDA textFlags
-    EOR #TEXT_ACTIVE
-    STA textFlags
+    BITCLR textFlags, TEXT_ACTIVE
     JMP update_text::done
 .endproc
 ;--------------------------------------

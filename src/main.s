@@ -25,6 +25,9 @@ sample_palette:
     SET OBSEL, #(SPRITECHR_BASE >> 14) | OBSIZE_8_16 
 
 
+
+
+
     LDX #PAL_0
     LDPT pointer, sample_palette
     JSR buffer_palette
